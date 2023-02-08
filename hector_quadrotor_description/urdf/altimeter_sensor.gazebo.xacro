@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Quadrotor Sensor Plugins -->
+  <xacro:macro name="altimeter_sensor">
+        <gazebo>
+          <plugin name="altimeter_sensor" filename="libhector_gazebo_ros_baro.so">
+            <updateRate>10.0</updateRate>
+            <bodyName>base_link</bodyName>
+            <frameId>$(arg base_link_frame)</frameId>
+            <topicName>pressure_height</topicName>
+            <altimeterTopicName>altimeter</altimeterTopicName>
+            <offset>0</offset>
+            <drift>10.0</drift>
+            <gaussianNoise>0.1</gaussianNoise>
+          </plugin>
+        </gazebo>
+  </xacro:macro>
+
+</robot>

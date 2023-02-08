@@ -4,20 +4,9 @@ project(hector_quadrotor_gazebo_plugins)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp gazebo_dev hector_gazebo_plugins hector_quadrotor_model geometry_msgs hector_uav_msgs dynamic_reconfigure)
+find_package(catkin REQUIRED COMPONENTS roscpp gazebo_dev hector_gazebo_plugins geometry_msgs hector_uav_msgs dynamic_reconfigure)
 include_directories(include ${catkin_INCLUDE_DIRS})
 
-## Find hector_quadrotor_model optional libraries
-if(TARGET hector_quadrotor_propulsion)
-  set(hector_quadrotor_propulsion_LIBRARY hector_quadrotor_propulsion)
-else()
-  find_library(hector_quadrotor_propulsion_LIBRARY hector_quadrotor_propulsion)
-endif()
-if(TARGET hector_quadrotor_propulsion)
-  set(hector_quadrotor_aerodynamics_LIBRARY hector_quadrotor_aerodynamics)
-else()
-  find_library(hector_quadrotor_aerodynamics_LIBRARY hector_quadrotor_aerodynamics)
-endif()
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS thread)
@@ -41,7 +30,7 @@ endif()
 catkin_package(
     INCLUDE_DIRS include
     LIBRARIES
-    CATKIN_DEPENDS roscpp hector_gazebo_plugins hector_quadrotor_model geometry_msgs hector_uav_msgs dynamic_reconfigure
+    CATKIN_DEPENDS roscpp hector_gazebo_plugins geometry_msgs hector_uav_msgs dynamic_reconfigure
 )
 
 ###########
@@ -52,23 +41,6 @@ add_library(hector_gazebo_ros_baro src/gazebo_ros_baro.cpp)
 target_link_libraries(hector_gazebo_ros_baro ${GAZEBO_LIBRARIES} ${catkin_LIBRARIES})
 add_dependencies(hector_gazebo_ros_baro hector_uav_msgs_generate_messages_cpp)
 
-add_library(hector_gazebo_quadrotor_simple_controller src/gazebo_quadrotor_simple_controller.cpp)
-target_link_libraries(hector_gazebo_quadrotor_simple_controller ${GAZEBO_LIBRARIES} ${catkin_LIBRARIES})
-
-if(hector_quadrotor_propulsion_LIBRARY)
-  add_library(hector_gazebo_quadrotor_propulsion src/gazebo_quadrotor_propulsion.cpp)
-  target_link_libraries(hector_gazebo_quadrotor_propulsion ${GAZEBO_LIBRARIES} ${catkin_LIBRARIES} ${hector_quadrotor_propulsion_LIBRARY})
-  add_dependencies(hector_gazebo_quadrotor_propulsion hector_uav_msgs_generate_messages_cpp)
-else()
-  message(WARNING "Quadrotor propulsion model is not available. Skipping target hector_gazebo_quadrotor_propulsion...")
-endif()
-
-if(hector_quadrotor_aerodynamics_LIBRARY)
-  add_library(hector_gazebo_quadrotor_aerodynamics src/gazebo_quadrotor_aerodynamics.cpp)
-  target_link_libraries(hector_gazebo_quadrotor_aerodynamics ${GAZEBO_LIBRARIES} ${catkin_LIBRARIES} ${hector_quadrotor_aerodynamics_LIBRARY})
-else()
-  message(WARNING "Quadrotor aerodynamics model is not available. Skipping target hector_gazebo_quadrotor_aerodynamics...")
-endif()
 
 #############
 ## Install ##
@@ -85,19 +57,11 @@ endif()
 # )
 
 ## Mark executables and/or libraries for installation
-install(TARGETS hector_gazebo_ros_baro hector_gazebo_quadrotor_simple_controller
+install(TARGETS hector_gazebo_ros_baro
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
-
-if(TARGET hector_gazebo_quadrotor_propulsion)
-  install(TARGETS hector_gazebo_quadrotor_propulsion LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})
-endif()
-
-if(TARGET hector_gazebo_quadrotor_aerodynamics)
-  install(TARGETS hector_gazebo_quadrotor_aerodynamics LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})
-endif()
 
 ## Mark cpp header files for installation
 install(DIRECTORY include/${PROJECT_NAME}/
